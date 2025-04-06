@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Ngôn Ngữ Cá Mập 🐋</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f1f5f9;
+      padding: 2rem;
+    }
+    .quiz-box {
+      background: white;
+      max-width: 700px;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .options button.correct { background: #d1fae5; border-color: #10b981; }
+    .options button.wrong { background: #fee2e2; border-color: #ef4444; }
+    .feedback { font-style: italic; margin-top: 1rem; color: #4b5563; }
+    .result { text-align: center; font-size: 1.25rem; margin-top: 2rem; }
+    .timer { font-family: monospace; background: black; color: white; padding: 0.3rem 0.6rem; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="quiz-box">
+    <div id="quiz">
+      <div class="meta">
+        <span id="counter">Câu 1</span>
+        <span class="timer" id="timer">15:00</span>
+      </div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button id="next" style="margin-top:1.5rem; display:none;">Câu tiếp theo</button>
+    </div>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    const questions = [
+  {
+    question: "Sau một đoạn sideway 20 nến, giá phá vỡ mạnh kèm volume lớn, sau đó đảo chiều nhanh. Đây là dấu hiệu của:",
+    options: ["Breakout thật", "Trap breakout", "Tăng giá mạnh", "Tích lũy tiếp diễn"],
+    answer: 1,
+    feedback: "Đây là dấu hiệu trap breakout – bẫy phá vỡ giả rất phổ biến cá mập dùng để dụ đu trend."
+  },
+  {
+    question: "Volume cao đột biến nhưng nến rất nhỏ, xảy ra tại vùng đỉnh – đây là dấu hiệu của:",
+    options: ["Tiếp diễn xu hướng", "Cá mập hấp thụ toàn bộ lệnh bán", "Cá mập đang phân phối", "Không có gì bất thường"],
+    answer: 2,
+    feedback: "Khi volume lớn mà nến nhỏ tại đỉnh → rất dễ là hành vi phân phối từ cá mập."
+  },
+  {
+    question: "Giá tạo mô hình vai đầu vai thuận, sau đó phá đáy giả và đảo chiều – đây là:",
+    options: ["Mô hình đúng", "Hành vi thị trường ngẫu nhiên", "Trap mô hình kỹ thuật", "Breakout thật"],
+    answer: 2,
+    feedback: "Đây là bẫy phổ biến – mô hình đúng bị lợi dụng để trap breakout giả."
+  },
+  {
+    question: "Trap thường xuyên nhất cá mập dùng là:",
+    options: ["Tin tức tốt → giá tăng", "Sideway kéo dài", "Breakout vùng cản rồi quay đầu", "Đảo chiều giá không lý do"],
+    answer: 2,
+    feedback: "Trap breakout là chiêu phổ biến nhất của cá mập để gom lệnh ngược chiều."
+  },
+  {
+    question: "Nến tăng rất mạnh nhưng volume giảm → thường báo hiệu:",
+    options: ["Cá mập đẩy giá thật", "Lực mua mạnh mẽ", "Giá sắp giảm", "Volume không quan trọng"],
+    answer: 2,
+    feedback: "Khi volume giảm mà nến tăng mạnh → cảnh báo lực mua giả, dễ đảo chiều."
+  },
+  {
+    question: "Râu nến rất dài xuyên hỗ trợ, sau đó giá bật lên → đây là:",
+    options: ["Stoploss hunt", "Giá giảm thật", "Phá vỡ thành công", "Đoạn nghỉ kỹ thuật"],
+    answer: 0,
+    feedback: "Râu dài xuyên vùng hỗ trợ thường là dấu hiệu săn stoploss (trap đáy)."
+  },
+  {
+    question: "Cá mập thường “nói gì” khi volume cao – giá không chạy?",
+    options: ["Họ đang nghỉ", "Họ chờ breakout", "Họ đang hấp thụ lệnh", "Đám đông đang quá mạnh"],
+    answer: 2,
+    feedback: "Volume cao nhưng giá đi ngang → cá mập đang hấp thụ lệnh nhỏ lẻ."
+  },
+  {
+    question: "Dấu hiệu trap xuất hiện rõ nhất khi:",
+    options: ["Tin ra xấu", "Volume cao + giá đảo chiều", "RSI quá bán", "MACD phân kỳ"],
+    answer: 1,
+    feedback: "Trap thường có volume lớn + giá đảo chiều đột ngột → cần cảnh giác."
+  },
+  {
+    question: "Một mẫu hình kỹ thuật phổ biến dễ bị trap là:",
+    options: ["Wedge", "Vai đầu vai", "Tam giác", "Tất cả đều đúng"],
+    answer: 3,
+    feedback: "Hầu hết các mẫu hình đều có thể bị lợi dụng để trap – đặc biệt là breakout sai hướng."
+  },
+  {
+    question: "Giá đi lên từng bước với volume thấp, sau đó đột ngột giảm mạnh – đây là:",
+    options: ["Tiếp diễn xu hướng", "Phân phối + xả hàng", "Breakout chậm", "Tăng theo tin tức"],
+    answer: 1,
+    feedback: "Đi lên chậm volume thấp → phân phối ngầm, sau đó là cú xả."
+  },
+  {
+    question: "Khi volume cao xuất hiện tại đáy với nến rút chân, đây thường là:",
+    options: ["Cá mập đang xả hàng", "Tín hiệu bán mạnh", "Dấu hiệu đảo chiều tiềm năng", "Dấu hiệu tiếp tục giảm"],
+    answer: 2,
+    feedback: "Volume cao + nến rút chân tại đáy là dấu hiệu cá mập gom hàng → khả năng đảo chiều."
+  },
+  {
+    question: "Volume tăng mạnh khi giá sideway → khả năng nào cao?",
+    options: ["Cá mập vào hàng hoặc ra hàng", "Giá sẽ tiếp tục đứng yên", "Chuẩn bị ra tin", "Không ảnh hưởng"],
+    answer: 0,
+    feedback: "Volume tăng trong sideway là hành vi của cá mập gom hoặc xả kín đáo."
+  },
+  {
+    question: "Giá giảm liên tục với volume giảm → báo hiệu gì?",
+    options: ["Cá mập đang xả", "Đà giảm yếu dần", "Tăng mạnh sắp tới", "Giá sẽ rơi tiếp"],
+    answer: 1,
+    feedback: "Volume giảm dần khi giá giảm = lực bán suy yếu → có thể đảo chiều."
+  },
+  {
+    question: "Khi nào volume “nói ngược” với nến?",
+    options: ["Khi volume thấp", "Khi trap xảy ra", "Khi tin ra", "Khi trend yếu"],
+    answer: 1,
+    feedback: "Trap thường có volume cao nhưng hướng nến ngược → đó là tín hiệu cá mập hành động ngược kỳ vọng."
+  },
+  {
+    question: "Tình huống: giá tăng – volume tăng đều – nhưng râu nến ngày càng dài → báo hiệu:",
+    options: ["Lực mua mạnh", "Lực bán xuất hiện", "Tiếp tục tăng", "Thị trường khỏe"],
+    answer: 1,
+    feedback: "Râu dài khi volume tăng → lực bán bắt đầu chặn lại xu hướng tăng."
+  },
+  {
+    question: "Volume thấp liên tục trong sideway dài → nghĩa là:",
+    options: ["Cá mập đã đi ngủ", "Thị trường đã chán", "Gom hàng im lặng", "Dừng giao dịch"],
+    answer: 2,
+    feedback: "Volume thấp kéo dài = tích lũy → cá mập âm thầm gom hàng chuẩn bị cho hành động lớn."
+  },
+  {
+    question: "Volume thấp mà giá tăng mạnh → cảnh báo gì?",
+    options: ["Cá mập đang đẩy thật", "FOMO từ nhỏ lẻ", "Giá khỏe", "Volume không quan trọng"],
+    answer: 1,
+    feedback: "Giá tăng không có volume = nhỏ lẻ FOMO → dễ bị trap đu đỉnh."
+  },
+  {
+    question: "Volume lớn nhất trong ngày xuất hiện ở đáy → thường là:",
+    options: ["Mở vị thế long từ cá mập", "Mua từ nhỏ lẻ", "Tin tốt", "Giá đang yếu"],
+    answer: 0,
+    feedback: "Cá mập thường gom rất mạnh ở đáy → volume lớn đột biến tại đáy = tín hiệu mua."
+  },
+  {
+    question: "Volume phân kỳ so với hành vi giá là dấu hiệu:",
+    options: ["Thị trường ổn định", "Không đáng chú ý", "Trap tiềm năng", "Xu hướng chắc chắn"],
+    answer: 2,
+    feedback: "Volume và giá lệch pha = khả năng trap hoặc đảo chiều sắp diễn ra."
+  },
+  {
+    question: "Volume phù hợp nhất để vào lệnh là:",
+    options: ["Sau trap và xác nhận volume giữ giá", "Khi volume giảm dần", "Volume càng to càng tốt", "Volume thấp và yên tĩnh"],
+    answer: 0,
+    feedback: "Nên vào sau khi trap xong + volume xác nhận hành vi giữ giá → vào lệnh an toàn."
+  },
+  {
+    question: "Giá vừa quét đáy, volume tăng mạnh, nến rút chân dài. Dự báo hợp lý nhất là:",
+    options: ["Cá mập tiếp tục bán", "Giá tiếp tục giảm", "Giá đảo chiều tăng", "Chưa rõ xu hướng"],
+    answer: 2,
+    feedback: "Đây là cú trap quét SL đáy, sau đó là tín hiệu đảo chiều – hành vi quen thuộc của cá mập."
+  },
+  {
+    question: "Sau khi giá phá đỉnh – volume thấp dần – nến ngắn dần → khả năng cao là:",
+    options: ["Cá mập chuẩn bị đẩy tiếp", "Sắp sideway", "Đang phân phối", "Giá sẽ bùng nổ tiếp"],
+    answer: 2,
+    feedback: "Phân phối thường đi kèm với nến yếu và volume giảm dần – chuẩn bị cho cú xả."
+  },
+  {
+    question: "Khi giá sideway lâu và volume bắt đầu tăng nhẹ → bạn nên:",
+    options: ["Mua vào", "Bán khống", "Theo dõi trap sắp tới", "Đánh theo trend cũ"],
+    answer: 2,
+    feedback: "Volume tăng khi sideway = cá mập chuẩn bị trap – quan sát kỹ trước khi hành động."
+  },
+  {
+    question: "Một cú break giả vừa diễn ra. Hành động tiếp theo nên là:",
+    options: ["Mua luôn", "Đợi trap xong → chờ xác nhận", "Bán ngay", "Đứng ngoài 3 ngày"],
+    answer: 1,
+    feedback: "Cần chờ xác nhận hành vi đảo chiều sau break giả trước khi vào lệnh."
+  },
+  {
+    question: "Trap mạnh vừa xảy ra → volume lớn → giá phục hồi chậm → dự báo:",
+    options: ["Cá mập chưa ra tay", "Giá sẽ sideway lâu", "Sắp có cú đảo chiều rõ ràng", "Vẫn chưa xác định được"],
+    answer: 2,
+    feedback: "Đây là dấu hiệu cá mập đã trap xong và sắp thực hiện cú đẩy giá ngược chiều."
+  },
+  {
+    question: "Khi tin tốt ra, giá tăng xong… đứng im → volume to → nên dự báo gì?",
+    options: ["Giá sẽ tiếp tục tăng", "Có khả năng trap", "Giá chắc chắn breakout", "Giá không còn hấp dẫn"],
+    answer: 1,
+    feedback: "Giá đứng im sau tin tốt = trap nhỏ lẻ mua vào → cảnh báo breakout giả."
+  },
+  {
+    question: "Sau một đợt giảm mạnh, giá sideway 2 tiếng + volume thấp → cá mập đang:",
+    options: ["Nghỉ trưa", "Tích lũy lại", "Bắt đáy", "Thoát hàng"],
+    answer: 1,
+    feedback: "Volume thấp sau đợt giảm = tích lũy đáy → hành vi gom hàng trở lại."
+  },
+  {
+    question: "Volume tăng nhưng giá không vượt đỉnh cũ → khả năng cao là:",
+    options: ["Đột phá chậm", "Đang dừng lực", "Cá mập đang đẩy", "Có lực cản lớn – có thể đảo chiều"],
+    answer: 3,
+    feedback: "Không vượt đỉnh + volume cao = lực cản mạnh, có thể đảo chiều."
+  },
+  {
+    question: "Mô hình đẹp + breakout đúng + volume tăng → khi nào vẫn là trap?",
+    options: ["Khi giá quay đầu nhanh", "Khi không có xác nhận pullback", "Khi tin ra gần đó", "Cả 3 đáp án trên"],
+    answer: 3,
+    feedback: "Cả 3 yếu tố đều có thể biến mô hình đẹp thành trap tinh vi."
+  },
+  {
+    question: "Dấu hiệu dễ nhận biết trap tin tức nhất là:",
+    options: ["Giá đi đúng hướng tin", "Volume thấp", "Giá đi một hướng → đảo chiều gấp", "RSI quá mua"],
+    answer: 2,
+    feedback: "Cá mập thường đẩy giá theo tin vài phút → sau đó đảo chiều mạnh → trap tin tức."
+  },
+  {
+    question: "Tin tốt ra, giá tăng mạnh 1 cây M5, sau đó sập mạnh. Volume lớn. Phản ứng hợp lý là:",
+    options: ["Mua thêm", "Đứng ngoài", "Bán theo hướng cá mập", "Giữ lệnh mua"],
+    answer: 2,
+    feedback: "Phản ứng ngược sau tin tốt + volume lớn = trap → nên đi cùng hướng cá mập."
+  },
+  {
+    question: "Nến H4 là trap – nhưng H1 và M15 chưa có tín hiệu → nên:",
+    options: ["Vào lệnh luôn", "Quan sát thêm xác nhận từ H1/M15", "Vào từ H4 thôi", "Mỗi khung tự giao dịch riêng"],
+    answer: 1,
+    feedback: "Nên đợi xác nhận từ khung nhỏ trước khi hành động theo trap lớn."
+  },
+  {
+    question: "Giá tăng nhiều ngày – chart M15 trap – chart H4 volume yếu → nên:",
+    options: ["Mua tiếp", "Bán đảo chiều thử", "Xác định tín hiệu phân phối", "Đợi tin ra"],
+    answer: 2,
+    feedback: "Trap M15 + volume yếu H4 = có thể là phân phối → cần cảnh giác đảo chiều."
+  },
+  {
+    question: "Tin ra → giá đi đúng 5 phút rồi quay đầu → hành vi này gọi là:",
+    options: ["Confirmation", "Tin thật", "Trap tin tức", "Fake news"],
+    answer: 2,
+    feedback: "Đây là trap tin tức kinh điển – đánh đúng rồi đảo chiều mạnh."
+  },
+  {
+    question: "Để kiểm tra trap cũ có lặp lại không nên:",
+    options: ["Mở RSI", "Dùng TradingView replay", "Xem kênh tin tức", "Chờ bạn bè phân tích"],
+    answer: 1,
+    feedback: "TradingView replay giúp ôn lại hành vi trap quá khứ – luyện phản xạ cực tốt."
+  },
+  {
+    question: "Giá tăng – volume to – râu dài – khung D1 → trap?",
+    options: ["Không đủ dữ kiện", "Có khả năng trap đỉnh", "Mua thêm", "Bán mạnh"],
+    answer: 1,
+    feedback: "Râu dài + volume to ở đỉnh D1 = trap đỉnh tiềm năng."
+  },
+  {
+    question: "Trap có thể bị bỏ qua khi:",
+    options: ["Volume thấp", "Không rõ ràng trap", "Nằm ngoài khung thời gian chính", "Tất cả đều đúng"],
+    answer: 3,
+    feedback: "Không phải trap nào cũng vào lệnh – hãy chọn lọc trap chất lượng."
+  },
+  {
+    question: "Một trap M5 xảy ra tại vùng phản ứng của H1 →",
+    options: ["Không đáng chú ý", "Rất nguy hiểm – trap đa timeframe", "Là tín hiệu mua mạnh", "Không ảnh hưởng"],
+    answer: 1,
+    feedback: "Trap trùng với vùng phản ứng lớn hơn → trap mạnh + dễ đảo chiều."
+  },
+  {
+    question: "Để giao dịch theo ngôn ngữ cá mập hiệu quả nhất, nên:",
+    options: ["Xem nhiều chỉ báo", "Theo hệ thống trap + volume + chu kỳ", "Theo RSI và MACD", "Tin vào trực giác"],
+    answer: 1,
+    feedback: "Phải có hệ thống logic dựa vào trap – volume – tâm lý đám đông."
+  },
+  {
+    question: "Khi bạn không chắc đó là trap thật hay giả, cách tốt nhất là:",
+    options: ["Không vào lệnh", "Đặt lệnh thử", "Hỏi chuyên gia", "Đợi tin ra"],
+    answer: 0,
+    feedback: "Không chắc trap → đứng ngoài là cách an toàn nhất!"
+  }
+];
+
+    let current = 0;
+    let score = 0;
+    let timer = 15 * 60;
+    let interval;
+
+    const qEl = document.getElementById('question');
+    const oEl = document.getElementById('options');
+    const fEl = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next');
+    const resEl = document.getElementById('result');
+
+    function loadQuestion() {
+      const q = questions[current];
+      document.getElementById('counter').textContent = `Câu ${current + 1}`;
+      qEl.textContent = q.question;
+      fEl.textContent = '';
+      oEl.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, i, q.answer, q.feedback);
+        oEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(btn, chosen, correct, feedback) {
+      [...oEl.children].forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.classList.add('correct');
+        else if (i === chosen) b.classList.add('wrong');
+      });
+      if (chosen === correct) score += 2;
+      fEl.textContent = '💡 ' + feedback;
+      nextBtn.style.display = 'inline-block';
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current < questions.length) {
+        loadQuestion();
+        nextBtn.style.display = 'none';
+      } else {
+        showResult();
+      }
+    };
+
+    function showResult() {
+      document.getElementById('quiz').style.display = 'none';
+      resEl.style.display = 'block';
+      resEl.innerHTML = `
+        🎉 Hoàn thành!<br/>
+        Điểm số: <strong>${score}/${questions.length * 2}</strong><br/>
+        ${
+          score >= 90
+            ? '🐋 Bạn là một Cá Mập thực chiến – đỉnh của chóp!'
+            : score >= 70
+            ? '👍 Rất tốt! Chỉ cần luyện thêm chút nữa là lên đỉnh cao.'
+            : '🧪 Cần luyện lại trap + volume + chiến lược nhé!'
+        }
+      `;
+    }
+
+    function updateTimer() {
+      const m = Math.floor(timer / 60);
+      const s = timer % 60;
+      document.getElementById('timer').textContent = `${m}:${String(s).padStart(2, '0')}`;
+      if (timer > 0) {
+        timer--;
+      } else {
+        clearInterval(interval);
+        showResult();
+      }
+    }
+
+    loadQuestion();
+    interval = setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html>
