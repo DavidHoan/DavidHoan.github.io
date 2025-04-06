@@ -58,7 +58,7 @@
   </div>
 
   <script>
-    const questions = [
+    let questions = [
   {
     question: "Sau một đoạn sideway 20 nến, giá phá vỡ mạnh kèm volume lớn, sau đó đảo chiều nhanh. Đây là dấu hiệu của:",
     options: ["Breakout thật", "Trap breakout", "Tăng giá mạnh", "Tích lũy tiếp diễn"],
@@ -301,20 +301,29 @@
   }
 ];
 
-    let current = 0;
     let score = 0;
     let timer = 15 * 60;
     let interval;
+    let shuffled = [];
 
     const qEl = document.getElementById('question');
     const oEl = document.getElementById('options');
     const fEl = document.getElementById('feedback');
     const nextBtn = document.getElementById('next');
     const resEl = document.getElementById('result');
+    const counterEl = document.getElementById('counter');
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
 
     function loadQuestion() {
-      const q = questions[current];
-      document.getElementById('counter').textContent = `Câu ${current + 1}`;
+      const q = shuffled[0];
+      counterEl.textContent = `Câu ${(score / 2) + 1}`;
       qEl.textContent = q.question;
       fEl.textContent = '';
       oEl.innerHTML = '';
@@ -338,8 +347,8 @@
     }
 
     nextBtn.onclick = () => {
-      current++;
-      if (current < questions.length) {
+      shuffled.shift();
+      if (shuffled.length > 0) {
         loadQuestion();
         nextBtn.style.display = 'none';
       } else {
@@ -375,6 +384,7 @@
       }
     }
 
+    shuffled = shuffle([...questions]);
     loadQuestion();
     interval = setInterval(updateTimer, 1000);
   </script>
