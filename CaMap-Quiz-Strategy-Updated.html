@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Gợi Ý Chiến Lược Cá Mập</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; color: #333; }
+    .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h2 { color: #2c3e50; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    select, button { margin-top: 5px; padding: 8px; font-size: 16px; width: 100%; }
+    .result { margin-top: 20px; padding: 15px; border-left: 4px solid #2980b9; background: #ecf0f1; }
+    .examples { margin-top: 40px; background: #fffbea; padding: 15px; border-radius: 8px; }
+    .examples h3 { color: #c0392b; }
+    .examples p { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Gợi Ý Chiến Lược Cá Mập Khi DCA Ngược Sóng</h2>
+
+    <label for="q1">1. Bạn đã DCA bao nhiêu lệnh?</label>
+    <select id="q1">
+      <option value="A">Dưới 3 lệnh</option>
+      <option value="B">Trên 3 lệnh</option>
+    </select>
+
+    <label for="q2">2. Tài khoản của bạn đang:</label>
+    <select id="q2">
+      <option value="A">Lỗ nhẹ hoặc hoà vốn</option>
+      <option value="B">Âm vừa (~10–20%)</option>
+      <option value="C">Âm nặng (>30%)</option>
+    </select>
+
+    <label for="q3">3. Bạn cảm nhận thị trường đang:</label>
+    <select id="q3">
+      <option value="A">Chỉ hồi kỹ thuật</option>
+      <option value="B">Đảo chiều nhẹ</option>
+      <option value="C">Đã đảo chiều rõ ràng</option>
+    </select>
+
+    <label for="q4">4. Bạn sẵn sàng:</label>
+    <select id="q4">
+      <option value="A">Giữ lệnh, chờ hồi</option>
+      <option value="B">Quan sát thêm</option>
+      <option value="C">Nhận sai – theo trend mới</option>
+    </select>
+
+    <button onclick="suggestStrategy()">Xem gợi ý chiến lược</button>
+
+    <div id="result" class="result" style="display: none;"></div>
+
+    <div class="examples">
+      <h3>🧪 Một số tổ hợp thực tế & Gợi ý:</h3>
+      <p><strong>Trường hợp A:</strong> Trên 3 lệnh, âm vừa, hồi kỹ thuật, quan sát → <em>Chiến lược 2: Hedge nhẹ + Quan sát kỹ</em></p>
+      <p><strong>Trường hợp B:</strong> Dưới 3 lệnh, lỗ nhẹ, hồi kỹ thuật, giữ lệnh → <em>Chiến lược 1: Chốt Dần – Thu Nhỏ</em></p>
+      <p><strong>Trường hợp C:</strong> Trên 3 lệnh, âm nặng, trend đảo rõ, sẵn sàng theo trend mới → <em>Chiến lược 3: Đảo Chiều Chủ Động</em></p>
+      <p><strong>Trường hợp D:</strong> Trên 3 lệnh, âm vừa, trend chưa rõ, đang phân vân → <em>Chiến lược 2: Hedge + chờ xác nhận</em></p>
+    </div>
+  </div>
+
+  <script>
+    function suggestStrategy() {
+      const q1 = document.getElementById('q1').value;
+      const q2 = document.getElementById('q2').value;
+      const q3 = document.getElementById('q3').value;
+      const q4 = document.getElementById('q4').value;
+
+      let suggestion = '';
+
+      if (q1 === 'A' && q2 === 'A' && q3 === 'A' && q4 === 'A') {
+        suggestion = '<strong>Chiến lược 1: Chốt Dần – Thu Nhỏ Vị Thế</strong><br>Bạn còn cơ hội hồi. Nên rút bớt, giảm rủi ro, quan sát thêm.';
+      } else if (q1 === 'B' && q2 === 'B' && q3 === 'B' && q4 === 'B') {
+        suggestion = '<strong>Chiến lược 2: Hedge Thông Minh + Quan Sát</strong><br>Khóa lệnh tạm thời, dừng lỗ lan rộng và đánh giá lại.';
+      } else if (q1 === 'B' && q2 === 'C' && q3 === 'C' && q4 === 'C') {
+        suggestion = '<strong>Chiến lược 3: Đảo Chiều Chủ Động</strong><br>Xu hướng đã sai rõ, nên dứt khoát cắt lệnh cũ và theo hướng mới.';
+      } else {
+        suggestion = '<strong>Chưa có chiến lược rõ ràng</strong><br>Hãy cân nhắc kết hợp quan sát thêm + giảm lệnh nếu cần. Đừng DCA thêm nếu thị trường chưa rõ xu hướng.';
+      }
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = suggestion;
+      resultDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
