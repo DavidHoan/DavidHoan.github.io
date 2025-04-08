@@ -3,52 +3,67 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bí Kíp Sinh Tồn Cùng Cá Mập</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #eaf7ff;
-      text-align: center;
-      padding: 60px;
-    }
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.15);
-      max-width: 600px;
-      margin: auto;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f8ff;
+      padding: 20px;
+      margin: 0;
+      color: #222;
     }
     h1 {
-      color: #1e5f74;
-      margin-bottom: 30px;
+      text-align: center;
+      color: #004080;
+      margin-bottom: 40px;
     }
-    .btn {
-      display: block;
-      width: 90%;
-      max-width: 400px;
-      margin: 15px auto;
-      padding: 15px 25px;
-      font-size: 18px;
-      background: #3498db;
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .button-container button {
+      background-color: #0077aa;
       color: white;
-      text-decoration: none;
+      border: none;
+      padding: 15px 25px;
+      width: 100%;
+      max-width: 320px;
+      font-size: 16px;
       border-radius: 8px;
-      transition: background 0.3s ease;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .btn:hover {
-      background: #2980b9;
+    .button-container button:hover {
+      background-color: #005f8d;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 22px;
+      }
+      .button-container button {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🦈 Bí Kíp Sinh Tồn Cùng Cá Mập</h1>
-    <a class="btn" href="CaMap-Quiz-Strategy-Updated.html">📉 Tình Trạng Và Giải Quyết DCA Âm</a>
-    <a class="btn" href="QuyetDinh-BaoVeTaiKhoan-DCA.html">🛡️ Các Bước Xử Lý DCA Âm</a>
-    <a class="btn" href="PhanBiet-HoiKyThuat-VS-DaoChieu.html">⚖️ Phân Biệt Hồi Kỹ Thuật và Đảo Chiều</a>
-    <a class="btn" href="ngonNguCaMap.html">🧠 Trắc Nghiệm Ngôn Ngữ Cá Mập</a>
-    <a class="btn" href="Cach-CaMap-XuLy-KetLenh.html">🚨 Khi Cá Mập Kẹt Lệnh</a>
-  </div>
+
+<h1>🦈 Bí Kíp Sinh Tồn Cùng Cá Mập</h1>
+
+<div class="button-container">
+  <button onclick="location.href='TinhTrang-DCA-Am.html'">Tình trạng và giải quyết DCA âm</button>
+  <button onclick="location.href='QuyetDinh-BaoVeTaiKhoan-DCA.html'">Các bước xử lý DCA âm</button>
+  <button onclick="location.href='3CamBien-DCA-NguocXuHuong.html'">3 cảm biến DCA ngược xu hướng</button>
+  <button onclick="location.href='PhanBiet-HoiKyThuat-VS-DaoChieu.html'">Phân biệt hồi kỹ thuật và đảo chiều</button>
+  <button onclick="location.href='YeuDiem-Cua-CaMap.html'">Điểm yếu Cá Mập</button>
+  <button onclick="location.href='NoiSo-Cua-CaMap.html'">Nỗi sợ của Cá Mập</button>
+</div>
+
 </body>
 </html>
